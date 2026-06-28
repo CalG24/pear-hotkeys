@@ -15,21 +15,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install dependencies
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+    
+    - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libasound2-dev libudev-dev
+        sudo apt-get install -y libasound2-dev libudev-dev libx11-dev libxi-dev libxtst-dev pkg-config
     
-    - name: Build
+    - name: Build release binary
       run: cargo build --release
     
     - name: Create release archive
       run: |
         cd target/release
         tar -czf pear-hotkeys-linux-x64.tar.gz pear-hotkeys
-        cd ../..
     
-    - name: Create Release
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: target/release/pear-hotkeys-linux-x64.tar.gz
