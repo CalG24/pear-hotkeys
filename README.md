@@ -1,6 +1,6 @@
 # Pear Desktop Hotkeys
 
-A lightweight, standalone Rust application that provides global hotkeys for [Pear Desktop](https://github.com/pear-devs/pear-desktop) with visual and audio feedback.
+A lightweight, standalone Rust application that provides global hotkeys (Like and Dislike for now) for [Pear Desktop](https://github.com/pear-devs/pear-desktop) with visual and audio feedback.
 
 ## Features
 
@@ -20,7 +20,7 @@ A lightweight, standalone Rust application that provides global hotkeys for [Pea
 
 ### Option 1: Download Pre-built Binary (Recommended)
 
-1. Download the latest release from the [Releases page](https://github.com/YOUR_USERNAME/pear-hotkeys/releases/latest)
+1. Download the latest release from the [Releases page](https://github.com/CalG24/pear-hotkeys/releases/latest)
 2. Extract and install:
 
 ```bash
