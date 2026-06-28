@@ -4,8 +4,9 @@ A lightweight, standalone Rust application that provides global hotkeys (Like an
 
 Currently Alt+L = Like & Alt+D = Dislike
 
-This can't be changed but will be possible in the next version.
+This can't be changed right now if you are using the prebuilt binary but will be possible in the next version.
 
+If you were to build from source, you would be able to quite easily go in and change the binds.
 
 ## Features
 
@@ -23,7 +24,7 @@ This can't be changed but will be possible in the next version.
 
 ## Installation
 
-### Option 1: Download Pre-built Binary (Recommended)
+### Option 1: Download Pre-built Binary (Recommended for casual users)
 
 1. Download the latest release from the [Releases page](https://github.com/CalG24/pear-hotkeys/releases/latest)
 2. Extract and install:
