@@ -1,0 +1,23 @@
+# Maintainer: CalG <calum@luanti.uk>
+pkgname=pear-hotkeys
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Global hotkeys for Pear Desktop with notifications and audio feedback"
+arch=('x86_64')
+url="https://github.com/CalG24/pear-hotkeys"
+license=('MIT')
+depends=('alsa-lib' 'libudev')
+makedepends=('cargo' 'git')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/CalG24/$pkgname/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$pkgname-$pkgver"
+    cargo build --release
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    install -Dm755 "target/release/$pkgname" "$pkgdir/usr/bin/$pkgname"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
