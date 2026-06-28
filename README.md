@@ -3,7 +3,9 @@
 A lightweight, standalone Rust application that provides global hotkeys (Like and Dislike for now) for [Pear Desktop](https://github.com/pear-devs/pear-desktop) with visual and audio feedback.
 
 Currently Alt+L = Like & Alt+D = Dislike
-Can't be change but will be possible in the next version.
+
+This can't be changed but will be possible in the next version.
+
 
 ## Features
 
