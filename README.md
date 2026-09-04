@@ -69,5 +69,10 @@ cd pear-hotkeys
 git checkout windows
 cargo build --release
 ```
+### Linux
 
 #### This README covers the Windows build (windows branch). The linux branch is an archive of the project's earliest history, back when it was a small dev test of the API plugin — kept as a starting reference for anyone wanting to build a Linux version.
+
+### Contributing
+
+#### Issues and pull requests are welcome. For larger changes, please open an issue first to discuss what you'd like to change.
