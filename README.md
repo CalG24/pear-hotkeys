@@ -1,8 +1,8 @@
 # Pear Hotkeys — Windows
 
-[![Build](https://github.com/CalG24/pear-hotkeys/actions/workflows/rust.yml/badge.svg?branch=windows)](https://github.com/CalG24/pear-hotkeys/actions/workflows/rust.yml)
+[![Build](https://github.com/CalG24/pear-hotkeys/actions/workflows/windows-rust.yml/badge.svg?branch=windows)](https://github.com/CalG24/pear-hotkeys/actions/workflows/windows-rust.yml)
 [![Release](https://img.shields.io/github/v/release/CalG24/pear-hotkeys)](https://github.com/CalG24/pear-hotkeys/releases)
-[![License](https://img.shields.io/github/license/CalG24/pear-hotkeys)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/CalG24/pear-hotkeys/total)](https://github.com/CalG24/pear-hotkeys/releases)
 
 A lightweight Windows tray app that adds global hotkeys for Liking / Disliking tracks via [Pear Desktop](https://github.com/pear-desktop)'s **API [Beta]** plugin.
