@@ -178,6 +178,7 @@ pub struct PearApp {
     capturing_dislike: bool,
     status_message: Option<String>,
     hwnd: HWND,
+    frame_count: u8,
 }
 
 impl PearApp {
@@ -197,7 +198,7 @@ impl PearApp {
         let hwnd_raw = hwnd as isize;
 
         let tray_handles = tray::build_tray();
-        let window_visible = Arc::new(AtomicBool::new(false));
+        let window_visible = Arc::new(AtomicBool::new(true));
 
         {
             let visible = window_visible.clone();
@@ -327,14 +328,6 @@ impl PearApp {
             });
         }
 
-        if !config.start_minimised {
-            unsafe {
-                ShowWindow(hwnd, SW_SHOWDEFAULT);
-                SetForegroundWindow(hwnd);
-            }
-            window_visible.store(true, Ordering::SeqCst);
-        }
-
         if let Err(e) = autostart::set_autostart(config.start_with_windows) {
             tracing::warn!("could not sync autostart: {e:#}");
         }
@@ -354,6 +347,7 @@ impl PearApp {
             capturing_dislike: false,
             status_message: None,
             hwnd,
+			frame_count: 0,
         }
     }
 
@@ -404,6 +398,18 @@ fn capture_combo(ctx: &egui::Context) -> Option<String> {
 
 impl eframe::App for PearApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+		// eframe's internal `post_rendering` step unconditionally calls
+        // window.set_visible(true) right after the FIRST rendered frame
+        // completes, overriding any earlier hide — this is a confirmed
+        // upstream behavior (egui issue #8459), not something we can hide
+        // around during frame 1. Waiting until frame 2 to hide means
+        // eframe's one-time forced show has already happened, so our hide
+        // is the last word and actually sticks.
+        self.frame_count = self.frame_count.saturating_add(1);
+        if self.frame_count == 2 && self.config.start_minimised {
+            self.set_window_visible(false);
+        }
+		
         if ctx.input(|i| i.viewport().close_requested()) && self.config.minimise_to_tray {
             ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);
             self.set_window_visible(false);

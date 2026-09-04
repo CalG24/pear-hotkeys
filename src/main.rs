@@ -81,13 +81,17 @@ fn main() {
     let config = config::Config::load();
 
     let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([480.0, 460.0])
-            .with_min_inner_size([420.0, 400.0])
-            .with_visible(false)
-            .with_icon(load_app_icon()),
-        ..Default::default()
-    };
+    viewport: egui::ViewportBuilder::default()
+        .with_inner_size([480.0, 460.0])
+        .with_min_inner_size([420.0, 400.0])
+        .with_icon(load_app_icon()),
+    // with_visible(false) is intentionally NOT used here — it's a known,
+    // unreliable eframe/winit behavior where the window shows anyway
+    // regardless of this setting. Hiding on startup is instead handled
+    // explicitly in app.rs via raw ShowWindow(SW_HIDE), the same
+    // mechanism already proven to work for "Hide to tray".
+    ..Default::default()
+	};
 
     eframe::run_native(
         "Pear Desktop — Settings",
