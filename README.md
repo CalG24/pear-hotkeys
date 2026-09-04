@@ -68,6 +68,6 @@ git clone https://github.com/CalG24/pear-hotkeys.git
 cd pear-hotkeys
 git checkout windows
 cargo build --release
+```
 
-
-This README covers the Windows build (windows branch). The linux branch is an archive of the project's earliest history, back when it was a small dev test of the API plugin — kept as a starting reference for anyone wanting to build a Linux version.
+#### This README covers the Windows build (windows branch). The linux branch is an archive of the project's earliest history, back when it was a small dev test of the API plugin — kept as a starting reference for anyone wanting to build a Linux version.
