@@ -1,0 +1,46 @@
+name: Rust
+
+on:
+  push:
+    branches: ["windows"]
+  pull_request:
+    branches: ["windows"]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    # windows-sys / winres / raw Win32 calls mean this only builds on Windows.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry & build artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Build
+        run: cargo build --release --verbose
+
+      - name: Run tests
+        run: cargo test --release --verbose
+
+      - name: Upload built exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: pear-hotkeys-win
+          path: target/release/pear-hotkeys-win.exe
+          if-no-files-found: error
