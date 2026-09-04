@@ -1,7 +1,7 @@
 use tauri_winrt_notification::Toast;
+use windows_sys::Win32::UI::Shell::SetCurrentProcessExplicitAppUserModelID;
 use winreg::enums::*;
 use winreg::RegKey;
-use windows_sys::Win32::UI::Shell::SetCurrentProcessExplicitAppUserModelID;
 
 pub const AUMID: &str = "PearDesktop.Hotkeys";
 
@@ -23,7 +23,9 @@ pub fn register_aumid() -> anyhow::Result<()> {
 
 pub fn set_process_aumid() {
     let wide: Vec<u16> = AUMID.encode_utf16().chain(std::iter::once(0)).collect();
-    unsafe { SetCurrentProcessExplicitAppUserModelID(wide.as_ptr()); }
+    unsafe {
+        SetCurrentProcessExplicitAppUserModelID(wide.as_ptr());
+    }
 }
 
 pub fn show(title: &str, body: &str) {

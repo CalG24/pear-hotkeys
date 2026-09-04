@@ -36,11 +36,12 @@ fn load_app_icon() -> egui::IconData {
     }
 }
 
-
 fn acquire_single_instance_lock() -> bool {
     unsafe {
         let handle = CreateMutexW(std::ptr::null(), 1, w!("Global\\PearDesktopHotkeys_Mutex"));
-        if handle.is_null() { return true; }
+        if handle.is_null() {
+            return true;
+        }
         if GetLastError() == ERROR_ALREADY_EXISTS {
             false
         } else {
@@ -55,7 +56,10 @@ fn init_logging() {
         let file_appender = tracing_appender::rolling::never(&log_dir, "pear.log");
         let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
         std::mem::forget(guard);
-        tracing_subscriber::fmt().with_writer(non_blocking).with_ansi(false).init();
+        tracing_subscriber::fmt()
+            .with_writer(non_blocking)
+            .with_ansi(false)
+            .init();
     } else {
         tracing_subscriber::fmt().init();
     }
@@ -77,13 +81,13 @@ fn main() {
     let config = config::Config::load();
 
     let native_options = eframe::NativeOptions {
-		viewport: egui::ViewportBuilder::default()
-			.with_inner_size([480.0, 460.0])
-			.with_min_inner_size([420.0, 400.0])
-			.with_visible(false)
-			.with_icon(load_app_icon()),
-		..Default::default()
-	};
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([480.0, 460.0])
+            .with_min_inner_size([420.0, 400.0])
+            .with_visible(false)
+            .with_icon(load_app_icon()),
+        ..Default::default()
+    };
 
     eframe::run_native(
         "Pear Desktop — Settings",

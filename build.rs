@@ -3,6 +3,7 @@ fn main() {
     {
         let mut res = winres::WindowsResource::new();
         res.set_icon("assets/icon.ico");
-        res.compile().expect("failed to embed icon.ico into the executable");
+        res.compile()
+            .expect("failed to embed icon.ico into the executable");
     }
 }

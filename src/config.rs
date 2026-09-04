@@ -12,8 +12,7 @@ pub struct Config {
     pub show_notifications: bool,
     pub start_with_windows: bool,
     pub minimise_to_tray: bool,
-	pub start_minimised: bool,
-
+    pub start_minimised: bool,
 }
 
 impl Default for Config {
@@ -27,14 +26,16 @@ impl Default for Config {
             show_notifications: true,
             start_with_windows: false,
             minimise_to_tray: true,
-			start_minimised: false,
+            start_minimised: false,
         }
     }
 }
 
 impl Config {
     pub fn dir() -> Result<PathBuf> {
-        let dir = dirs::config_dir().context("could not resolve %APPDATA%")?.join("PearDesktop");
+        let dir = dirs::config_dir()
+            .context("could not resolve %APPDATA%")?
+            .join("PearDesktop");
         std::fs::create_dir_all(&dir)?;
         Ok(dir)
     }

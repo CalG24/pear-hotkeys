@@ -9,7 +9,7 @@ use raw_window_handle::{HasWindowHandle, RawWindowHandle};
 use tray_icon::{menu::MenuEvent, MouseButton, MouseButtonState, TrayIcon, TrayIconEvent};
 use windows_sys::Win32::Foundation::HWND;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    ShowWindow, SetForegroundWindow, SetTimer, SW_HIDE, SW_SHOWDEFAULT,
+    SetForegroundWindow, SetTimer, ShowWindow, SW_HIDE, SW_SHOWDEFAULT,
 };
 
 use crate::api::{self, HotkeyAction};
@@ -38,7 +38,11 @@ struct HotkeySettings {
 }
 
 fn human_state(state: &str) -> &str {
-    match state { "LIKE" => "Liked ❤️", "DISLIKE" => "Disliked 👎", _ => "Connected" }
+    match state {
+        "LIKE" => "Liked ❤️",
+        "DISLIKE" => "Disliked 👎",
+        _ => "Connected",
+    }
 }
 
 fn toggle_window_raw(hwnd_raw: isize, visible: &Arc<AtomicBool>) {
@@ -131,14 +135,16 @@ async fn do_trigger(
             if show_notifications {
                 let (title, body) = match (action, new_state.as_deref()) {
                     (HotkeyAction::Like, Some("LIKE")) => ("YouTube Music", "Liked ❤️"),
-                    (HotkeyAction::Like, Some(_))      => ("YouTube Music", "Unliked 🤍"),
+                    (HotkeyAction::Like, Some(_)) => ("YouTube Music", "Unliked 🤍"),
                     (HotkeyAction::Dislike, Some("DISLIKE")) => ("YouTube Music", "Disliked 👎"),
-                    (HotkeyAction::Dislike, Some(_))         => ("YouTube Music", "Removed dislike 👍"),
+                    (HotkeyAction::Dislike, Some(_)) => ("YouTube Music", "Removed dislike 👍"),
                     (_, None) => ("YouTube Music", "Updated"),
                 };
                 std::thread::spawn(move || notification::show(title, body));
             }
-            if sound_enabled { audio::play_notification_sound(); }
+            if sound_enabled {
+                audio::play_notification_sound();
+            }
         }
         Err(e) => {
             let mut s = shared.lock().unwrap();
@@ -168,7 +174,10 @@ pub struct PearApp {
 impl PearApp {
     pub fn new(cc: &eframe::CreationContext<'_>, config: Config) -> Self {
         let rt = tokio::runtime::Runtime::new().expect("failed to start tokio runtime");
-        let client = reqwest::Client::builder().timeout(Duration::from_secs(5)).build().unwrap();
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_secs(5))
+            .build()
+            .unwrap();
         let hotkeys = Hotkeys::new(&config)
             .expect("failed to register global hotkeys — check they aren't used elsewhere");
 
@@ -238,35 +247,47 @@ impl PearApp {
             let rt_handle = rt.handle().clone();
             let ctx = cc.egui_ctx.clone();
 
-            hotkeys::GlobalHotKeyEvent::set_event_handler(Some(move |event: hotkeys::GlobalHotKeyEvent| {
-                if event.state != HotKeyState::Pressed { return; }
-
-                let s = settings.lock().unwrap().clone();
-                let action = if event.id == s.like_id {
-                    HotkeyAction::Like
-                } else if event.id == s.dislike_id {
-                    HotkeyAction::Dislike
-                } else {
-                    return;
-                };
-
-                {
-                    let mut lt = last_trigger.lock().unwrap();
-                    let now = Instant::now();
-                    if now.duration_since(*lt) < Duration::from_millis(s.debounce_ms) {
+            hotkeys::GlobalHotKeyEvent::set_event_handler(Some(
+                move |event: hotkeys::GlobalHotKeyEvent| {
+                    if event.state != HotKeyState::Pressed {
                         return;
                     }
-                    *lt = now;
-                }
 
-                let client = client.clone();
-                let shared = shared.clone();
-                let ctx = ctx.clone();
-                rt_handle.spawn(async move {
-                    do_trigger(client, s.api_url, shared, s.sound_enabled, s.show_notifications, action).await;
-                    ctx.request_repaint();
-                });
-            }));
+                    let s = settings.lock().unwrap().clone();
+                    let action = if event.id == s.like_id {
+                        HotkeyAction::Like
+                    } else if event.id == s.dislike_id {
+                        HotkeyAction::Dislike
+                    } else {
+                        return;
+                    };
+
+                    {
+                        let mut lt = last_trigger.lock().unwrap();
+                        let now = Instant::now();
+                        if now.duration_since(*lt) < Duration::from_millis(s.debounce_ms) {
+                            return;
+                        }
+                        *lt = now;
+                    }
+
+                    let client = client.clone();
+                    let shared = shared.clone();
+                    let ctx = ctx.clone();
+                    rt_handle.spawn(async move {
+                        do_trigger(
+                            client,
+                            s.api_url,
+                            shared,
+                            s.sound_enabled,
+                            s.show_notifications,
+                            action,
+                        )
+                        .await;
+                        ctx.request_repaint();
+                    });
+                },
+            ));
         }
 
         {
@@ -281,8 +302,15 @@ impl PearApp {
                     let result = api::get_like_state(&client, &base_url).await;
                     let mut s = shared.lock().unwrap();
                     match result {
-                        Ok(state) => { s.connected = true; s.like_state = state.state; s.last_error = None; }
-                        Err(e) => { s.connected = false; s.last_error = Some(e.to_string()); }
+                        Ok(state) => {
+                            s.connected = true;
+                            s.like_state = state.state;
+                            s.last_error = None;
+                        }
+                        Err(e) => {
+                            s.connected = false;
+                            s.last_error = Some(e.to_string());
+                        }
                     }
                     drop(s);
                     ctx.request_repaint();
@@ -336,15 +364,31 @@ impl PearApp {
 fn capture_combo(ctx: &egui::Context) -> Option<String> {
     ctx.input(|i| {
         i.events.iter().find_map(|event| {
-            if let egui::Event::Key { key, pressed: true, modifiers, .. } = event {
+            if let egui::Event::Key {
+                key,
+                pressed: true,
+                modifiers,
+                ..
+            } = event
+            {
                 let mut parts = Vec::new();
-                if modifiers.ctrl { parts.push("Ctrl".to_string()); }
-                if modifiers.alt { parts.push("Alt".to_string()); }
-                if modifiers.shift { parts.push("Shift".to_string()); }
-                if parts.is_empty() { return None; }
+                if modifiers.ctrl {
+                    parts.push("Ctrl".to_string());
+                }
+                if modifiers.alt {
+                    parts.push("Alt".to_string());
+                }
+                if modifiers.shift {
+                    parts.push("Shift".to_string());
+                }
+                if parts.is_empty() {
+                    return None;
+                }
                 parts.push(format!("{key:?}"));
                 Some(parts.join("+"))
-            } else { None }
+            } else {
+                None
+            }
         })
     })
 }
@@ -364,12 +408,17 @@ impl eframe::App for PearApp {
             ui.horizontal(|ui| {
                 ui.label("Status:");
                 if s.connected {
-                    ui.colored_label(egui::Color32::from_rgb(0, 170, 0), format!("● {}", human_state(&s.like_state)));
+                    ui.colored_label(
+                        egui::Color32::from_rgb(0, 170, 0),
+                        format!("● {}", human_state(&s.like_state)),
+                    );
                 } else {
                     ui.colored_label(egui::Color32::RED, "● Not connected");
                 }
             });
-            if let Some(err) = &s.last_error { ui.small(format!("Last error: {err}")); }
+            if let Some(err) = &s.last_error {
+                ui.small(format!("Last error: {err}"));
+            }
 
             ui.separator();
             ui.label("API");
@@ -383,21 +432,42 @@ impl eframe::App for PearApp {
             ui.horizontal(|ui| {
                 ui.label("Like:");
                 ui.monospace(&self.edit_config.hotkey_like);
-                if ui.button(if self.capturing_like { "Press keys…" } else { "Rebind" }).clicked() {
-                    self.capturing_like = true; self.capturing_dislike = false;
+                if ui
+                    .button(if self.capturing_like {
+                        "Press keys…"
+                    } else {
+                        "Rebind"
+                    })
+                    .clicked()
+                {
+                    self.capturing_like = true;
+                    self.capturing_dislike = false;
                 }
             });
             ui.horizontal(|ui| {
                 ui.label("Dislike:");
                 ui.monospace(&self.edit_config.hotkey_dislike);
-                if ui.button(if self.capturing_dislike { "Press keys…" } else { "Rebind" }).clicked() {
-                    self.capturing_dislike = true; self.capturing_like = false;
+                if ui
+                    .button(if self.capturing_dislike {
+                        "Press keys…"
+                    } else {
+                        "Rebind"
+                    })
+                    .clicked()
+                {
+                    self.capturing_dislike = true;
+                    self.capturing_like = false;
                 }
             });
             if self.capturing_like || self.capturing_dislike {
                 if let Some(combo) = capture_combo(ctx) {
-                    if self.capturing_like { self.edit_config.hotkey_like = combo; self.capturing_like = false; }
-                    else { self.edit_config.hotkey_dislike = combo; self.capturing_dislike = false; }
+                    if self.capturing_like {
+                        self.edit_config.hotkey_like = combo;
+                        self.capturing_like = false;
+                    } else {
+                        self.edit_config.hotkey_dislike = combo;
+                        self.capturing_dislike = false;
+                    }
                 }
             }
 
@@ -408,10 +478,22 @@ impl eframe::App for PearApp {
                 ui.add(egui::DragValue::new(&mut self.edit_config.debounce_ms).range(0..=5000));
             });
             ui.checkbox(&mut self.edit_config.sound_enabled, "Play sound on action");
-            ui.checkbox(&mut self.edit_config.show_notifications, "Show notification on action");
-            ui.checkbox(&mut self.edit_config.start_with_windows, "Start with Windows");
-            ui.checkbox(&mut self.edit_config.minimise_to_tray, "Minimise to tray on close");
-            ui.checkbox(&mut self.edit_config.start_minimised, "Start minimised to tray");
+            ui.checkbox(
+                &mut self.edit_config.show_notifications,
+                "Show notification on action",
+            );
+            ui.checkbox(
+                &mut self.edit_config.start_with_windows,
+                "Start with Windows",
+            );
+            ui.checkbox(
+                &mut self.edit_config.minimise_to_tray,
+                "Minimise to tray on close",
+            );
+            ui.checkbox(
+                &mut self.edit_config.start_minimised,
+                "Start minimised to tray",
+            );
 
             ui.separator();
             ui.horizontal(|ui| {
@@ -436,13 +518,16 @@ impl eframe::App for PearApp {
                 }
                 if ui.button("Cancel").clicked() {
                     self.edit_config = self.config.clone();
-                    self.capturing_like = false; self.capturing_dislike = false;
+                    self.capturing_like = false;
+                    self.capturing_dislike = false;
                 }
                 if ui.button("Hide to tray").clicked() {
                     self.set_window_visible(false);
                 }
             });
-            if let Some(msg) = &self.status_message { ui.label(msg); }
+            if let Some(msg) = &self.status_message {
+                ui.label(msg);
+            }
         });
 
         ctx.request_repaint_after(Duration::from_millis(50));

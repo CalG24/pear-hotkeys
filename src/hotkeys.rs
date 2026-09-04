@@ -17,11 +17,19 @@ impl Hotkeys {
         let dislike_hotkey = parse_hotkey(&config.hotkey_dislike)?;
         manager.register(like_hotkey)?;
         manager.register(dislike_hotkey)?;
-        Ok(Self { manager, like_hotkey, dislike_hotkey })
+        Ok(Self {
+            manager,
+            like_hotkey,
+            dislike_hotkey,
+        })
     }
 
-    pub fn like_id(&self) -> u32 { self.like_hotkey.id() }
-    pub fn dislike_id(&self) -> u32 { self.dislike_hotkey.id() }
+    pub fn like_id(&self) -> u32 {
+        self.like_hotkey.id()
+    }
+    pub fn dislike_id(&self) -> u32 {
+        self.dislike_hotkey.id()
+    }
 
     pub fn re_register(&mut self, config: &Config) -> Result<()> {
         let _ = self.manager.unregister(self.like_hotkey);
@@ -53,20 +61,72 @@ pub fn parse_hotkey(spec: &str) -> Result<HotKey> {
 fn parse_code(key: &str) -> Result<Code> {
     use Code::*;
     Ok(match key {
-        "A"=>KeyA,"B"=>KeyB,"C"=>KeyC,"D"=>KeyD,"E"=>KeyE,"F"=>KeyF,"G"=>KeyG,"H"=>KeyH,
-        "I"=>KeyI,"J"=>KeyJ,"K"=>KeyK,"L"=>KeyL,"M"=>KeyM,"N"=>KeyN,"O"=>KeyO,"P"=>KeyP,
-        "Q"=>KeyQ,"R"=>KeyR,"S"=>KeyS,"T"=>KeyT,"U"=>KeyU,"V"=>KeyV,"W"=>KeyW,"X"=>KeyX,
-        "Y"=>KeyY,"Z"=>KeyZ,
-        "0"|"NUM0"=>Digit0,"1"|"NUM1"=>Digit1,"2"|"NUM2"=>Digit2,"3"|"NUM3"=>Digit3,
-        "4"|"NUM4"=>Digit4,"5"|"NUM5"=>Digit5,"6"|"NUM6"=>Digit6,"7"|"NUM7"=>Digit7,
-        "8"|"NUM8"=>Digit8,"9"|"NUM9"=>Digit9,
-        "F1"=>F1,"F2"=>F2,"F3"=>F3,"F4"=>F4,"F5"=>F5,"F6"=>F6,
-        "F7"=>F7,"F8"=>F8,"F9"=>F9,"F10"=>F10,"F11"=>F11,"F12"=>F12,
-        "SPACE"=>Space, "ENTER"|"RETURN"=>Enter, "ESC"|"ESCAPE"=>Escape, "TAB"=>Tab,
-        "UP"|"ARROWUP"=>ArrowUp, "DOWN"|"ARROWDOWN"=>ArrowDown,
-        "LEFT"|"ARROWLEFT"=>ArrowLeft, "RIGHT"|"ARROWRIGHT"=>ArrowRight,
-        "BACKSPACE"=>Backspace, "DELETE"|"DEL"=>Delete,
-        "HOME"=>Home, "END"=>End, "PAGEUP"=>PageUp, "PAGEDOWN"=>PageDown,
-        other => return Err(anyhow!("unrecognised key '{other}' — add it to hotkeys.rs::parse_code")),
+        "A" => KeyA,
+        "B" => KeyB,
+        "C" => KeyC,
+        "D" => KeyD,
+        "E" => KeyE,
+        "F" => KeyF,
+        "G" => KeyG,
+        "H" => KeyH,
+        "I" => KeyI,
+        "J" => KeyJ,
+        "K" => KeyK,
+        "L" => KeyL,
+        "M" => KeyM,
+        "N" => KeyN,
+        "O" => KeyO,
+        "P" => KeyP,
+        "Q" => KeyQ,
+        "R" => KeyR,
+        "S" => KeyS,
+        "T" => KeyT,
+        "U" => KeyU,
+        "V" => KeyV,
+        "W" => KeyW,
+        "X" => KeyX,
+        "Y" => KeyY,
+        "Z" => KeyZ,
+        "0" | "NUM0" => Digit0,
+        "1" | "NUM1" => Digit1,
+        "2" | "NUM2" => Digit2,
+        "3" | "NUM3" => Digit3,
+        "4" | "NUM4" => Digit4,
+        "5" | "NUM5" => Digit5,
+        "6" | "NUM6" => Digit6,
+        "7" | "NUM7" => Digit7,
+        "8" | "NUM8" => Digit8,
+        "9" | "NUM9" => Digit9,
+        "F1" => F1,
+        "F2" => F2,
+        "F3" => F3,
+        "F4" => F4,
+        "F5" => F5,
+        "F6" => F6,
+        "F7" => F7,
+        "F8" => F8,
+        "F9" => F9,
+        "F10" => F10,
+        "F11" => F11,
+        "F12" => F12,
+        "SPACE" => Space,
+        "ENTER" | "RETURN" => Enter,
+        "ESC" | "ESCAPE" => Escape,
+        "TAB" => Tab,
+        "UP" | "ARROWUP" => ArrowUp,
+        "DOWN" | "ARROWDOWN" => ArrowDown,
+        "LEFT" | "ARROWLEFT" => ArrowLeft,
+        "RIGHT" | "ARROWRIGHT" => ArrowRight,
+        "BACKSPACE" => Backspace,
+        "DELETE" | "DEL" => Delete,
+        "HOME" => Home,
+        "END" => End,
+        "PAGEUP" => PageUp,
+        "PAGEDOWN" => PageDown,
+        other => {
+            return Err(anyhow!(
+                "unrecognised key '{other}' — add it to hotkeys.rs::parse_code"
+            ))
+        }
     })
 }

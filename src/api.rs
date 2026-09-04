@@ -16,17 +16,27 @@ pub enum HotkeyAction {
 pub async fn get_like_state(client: &reqwest::Client, base_url: &str) -> Result<LikeState> {
     Ok(client
         .get(format!("{base_url}/api/v1/like-state"))
-        .send().await?
+        .send()
+        .await?
         .error_for_status()?
-        .json::<LikeState>().await?)
+        .json::<LikeState>()
+        .await?)
 }
 
 pub async fn post_like(client: &reqwest::Client, base_url: &str) -> Result<()> {
-    client.post(format!("{base_url}/api/v1/like")).send().await?.error_for_status()?;
+    client
+        .post(format!("{base_url}/api/v1/like"))
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(())
 }
 
 pub async fn post_dislike(client: &reqwest::Client, base_url: &str) -> Result<()> {
-    client.post(format!("{base_url}/api/v1/dislike")).send().await?.error_for_status()?;
+    client
+        .post(format!("{base_url}/api/v1/dislike"))
+        .send()
+        .await?
+        .error_for_status()?;
     Ok(())
 }

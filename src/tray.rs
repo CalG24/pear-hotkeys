@@ -13,9 +13,16 @@ pub struct TrayHandles {
 const TRAY_ICON_SIZE: u32 = 32;
 
 fn load_icon(bytes: &[u8]) -> Icon {
-    let img = image::load_from_memory(bytes).expect("bundled tray icon is invalid").into_rgba8();
+    let img = image::load_from_memory(bytes)
+        .expect("bundled tray icon is invalid")
+        .into_rgba8();
     let resized = if img.width() != TRAY_ICON_SIZE || img.height() != TRAY_ICON_SIZE {
-        image::imageops::resize(&img, TRAY_ICON_SIZE, TRAY_ICON_SIZE, image::imageops::FilterType::Lanczos3)
+        image::imageops::resize(
+            &img,
+            TRAY_ICON_SIZE,
+            TRAY_ICON_SIZE,
+            image::imageops::FilterType::Lanczos3,
+        )
     } else {
         img
     };
@@ -44,7 +51,11 @@ pub fn build_tray() -> TrayHandles {
         .build()
         .expect("failed to build tray icon");
 
-    TrayHandles { tray: Rc::new(tray), show_id, quit_id }
+    TrayHandles {
+        tray: Rc::new(tray),
+        show_id,
+        quit_id,
+    }
 }
 
 pub fn icon_for_state(state: &str) -> Icon {

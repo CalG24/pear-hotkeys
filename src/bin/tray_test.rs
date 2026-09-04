@@ -1,8 +1,12 @@
 // src/bin/tray_test.rs
-use tray_icon::{TrayIconBuilder, menu::{Menu, MenuItem}, TrayIconEvent, menu::MenuEvent};
+use tray_icon::{
+    menu::MenuEvent,
+    menu::{Menu, MenuItem},
+    TrayIconBuilder, TrayIconEvent,
+};
 
 fn main() {
-    let icon = tray_icon::Icon::from_rgba(vec![255,0,0,255], 1, 1).unwrap();
+    let icon = tray_icon::Icon::from_rgba(vec![255, 0, 0, 255], 1, 1).unwrap();
     let menu = Menu::new();
     let item = MenuItem::new("Quit", true, None);
     menu.append(&item).unwrap();
