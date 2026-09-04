@@ -347,7 +347,7 @@ impl PearApp {
             capturing_dislike: false,
             status_message: None,
             hwnd,
-			frame_count: 0,
+            frame_count: 0,
         }
     }
 
@@ -398,7 +398,7 @@ fn capture_combo(ctx: &egui::Context) -> Option<String> {
 
 impl eframe::App for PearApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-		// eframe's internal `post_rendering` step unconditionally calls
+        // eframe's internal `post_rendering` step unconditionally calls
         // window.set_visible(true) right after the FIRST rendered frame
         // completes, overriding any earlier hide — this is a confirmed
         // upstream behavior (egui issue #8459), not something we can hide
@@ -409,7 +409,7 @@ impl eframe::App for PearApp {
         if self.frame_count == 2 && self.config.start_minimised {
             self.set_window_visible(false);
         }
-		
+
         if ctx.input(|i| i.viewport().close_requested()) && self.config.minimise_to_tray {
             ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);
             self.set_window_visible(false);
