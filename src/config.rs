@@ -44,7 +44,7 @@ impl Config {
         Ok(Self::dir()?.join("config.toml"))
     }
 
-	#[allow(dead_code)] // reserved for future log-viewer / diagnostics UI
+    #[allow(dead_code)] // reserved for future log-viewer / diagnostics UI
     pub fn log_path() -> Result<PathBuf> {
         Ok(Self::dir()?.join("pear.log"))
     }
