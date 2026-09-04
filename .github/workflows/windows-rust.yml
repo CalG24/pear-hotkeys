@@ -3,6 +3,7 @@ name: Rust
 on:
   push:
     branches: ["windows"]
+    tags: ["v*.*.*"]
   pull_request:
     branches: ["windows"]
   workflow_dispatch:
@@ -12,7 +13,6 @@ env:
 
 jobs:
   build:
-    # windows-sys / winres / raw Win32 calls mean this only builds on Windows.
     runs-on: windows-latest
 
     steps:
@@ -38,9 +38,31 @@ jobs:
       - name: Run tests
         run: cargo test --release --verbose
 
-      - name: Upload built exe
+      - name: Upload built exe (CI artifact)
         uses: actions/upload-artifact@v4
         with:
           name: pear-hotkeys-win
           path: target/release/pear-hotkeys-win.exe
           if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release binary
+        run: cargo build --release --verbose
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/release/pear-hotkeys-win.exe
+          generate_release_notes: true
