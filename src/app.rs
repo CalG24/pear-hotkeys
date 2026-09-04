@@ -68,9 +68,9 @@ fn toggle_window_raw(hwnd_raw: isize, visible: &Arc<AtomicBool>) {
 // of the same message-pump dispatch already proven to run continuously
 // even when minimised, via the tray/menu event tests earlier).
 thread_local! {
-    static TRAY_ICON: RefCell<Option<Rc<TrayIcon>>> = RefCell::new(None);
-    static TRAY_SHARED: RefCell<Option<Arc<Mutex<SharedState>>>> = RefCell::new(None);
-    static TRAY_LAST_STATE: RefCell<String> = RefCell::new(String::new());
+    static TRAY_ICON: RefCell<Option<Rc<TrayIcon>>> = const { RefCell::new(None) };
+    static TRAY_SHARED: RefCell<Option<Arc<Mutex<SharedState>>>> = const { RefCell::new(None) };
+    static TRAY_LAST_STATE: RefCell<String> = const { RefCell::new(String::new()) };
 }
 
 unsafe extern "system" fn tray_refresh_timer_proc(_hwnd: HWND, _msg: u32, _id: usize, _time: u32) {
@@ -159,9 +159,18 @@ pub struct PearApp {
     edit_config: Config,
     hotkeys: Hotkeys,
     hotkey_settings: Arc<Mutex<HotkeySettings>>,
+    // These four are only ever accessed through clones captured by the
+    // hotkey/health-check closures — never via `self.field` — but must
+    // stay alive here for their side effects (runtime kept running, tray
+    // icon kept from being destroyed, etc.), so silence dead-code rather
+    // than remove them.
+    #[allow(dead_code)]
     last_trigger: Arc<Mutex<Instant>>,
+    #[allow(dead_code)]
     tray: TrayHandles,
+    #[allow(dead_code)]
     rt: tokio::runtime::Runtime,
+    #[allow(dead_code)]
     client: reqwest::Client,
     shared: Arc<Mutex<SharedState>>,
     window_visible: Arc<AtomicBool>,

@@ -45,7 +45,7 @@ fn acquire_single_instance_lock() -> bool {
         if GetLastError() == ERROR_ALREADY_EXISTS {
             false
         } else {
-            std::mem::forget(handle);
+            let _ = handle;
             true
         }
     }
