@@ -25,7 +25,7 @@ Started as a small personal test of that plugin's API; it's since grown into a f
 ## Installation
 
 1. Grab the latest `pear-hotkeys-win.exe` from the [Releases page](https://github.com/CalG24/pear-hotkeys/releases).
-2. Make sure [Pear Desktop](https://github.com/pear-desktop) is running with the **API [Beta]** plugin enabled.
+2. Make sure [Pear Desktop](https://github.com/pear-desktop) is running with the **API [Beta]** plugin enabled. ***DISCLAIMER:*** I didn't Implement the new authorization feature of the API yet. You must turn "Plugins > API Server > Authorization Strategy > No Authorization" on for this to work right now. 
 3. Run the `.exe`. It starts in the tray — right-click the icon for options, or left-click to open Settings.
 
 ## Usage
